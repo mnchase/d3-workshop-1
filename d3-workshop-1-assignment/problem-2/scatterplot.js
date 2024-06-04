@@ -74,7 +74,8 @@ function drawScatterPlot(data) {
         2. Add a title to the visualization
             a. The title should have the class "title"
         3. Add x and y axis labels to the visualization
-            a. The axis labels should have the class "axis-label"                               */
+            a. The axis labels should have the class "axis-label"
+            b. The y axis should be rotated counter-clockwise 90 degrees                        */
 
 }
 
