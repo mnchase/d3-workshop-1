@@ -8,11 +8,9 @@
 }
 
 .dot {
-    fill: red
-    Fill-opacity: 
-    /* TODO: Style the dot class 
-        1. change the fill color of the dot
-        2. (option) change the outline color of the dot */
+    fill: red;
+    fill-opacity:  0.25;
+    stroke: red;
 }
 
 .title {

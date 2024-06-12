@@ -7,8 +7,8 @@ const margin = {
     right: 50
 }
 
-const title_x_position = margin.left + (width-(margin.left+margin.right))/2;
-const title_y_position = margin.top;
+const title_x_pos = margin.left + (width-(margin.left+margin.right))/2;
+const title_y_pos = margin.top;
 
 const x_ax_x_pos = margin.left + (width-(margin.left+margin.right))/2;
 const x_ax_y_pos = height - margin.bottom/2;
@@ -87,21 +87,28 @@ function drawScatterPlot(data) {
 
     drawXAxis(svg)
     drawYAxis(svg)
+    let title_group = svg.append('g')
+			.attr('class', 'title')
+			.attr('transform', 'translate('+title_x_pos+','+title_y_pos+')')
+			.append('text');
+    title_group.append('tspan')
+		.attr('x', 0)
+		.attr('dy', '-0em')
+		.text('Natural History Museums:');
+    title_group.append('tspan')
+		.attr('x', 0)
+		.attr('dy', '1.2em')
+		.text('Income vs Revenue');
     svg.append('text')
-	.attr('class', 'title')
-	.attr('x', title_x_position)
-	.attr('y', title_y_position)
-	.text('Natural History Museums: Revenue vs Income');
-    svg.append('text')
-	.attr('class', 'axis-label');
-	.attr('x', x_axis_x_position)
-	.attr('y', (height+x_axis_y_position)/2)
+	.attr('class', 'axis-label')
+	.attr('x', x_ax_x_pos)
+	.attr('y', (height+x_ax_y_pos)/2)
 	.text('Income');
     svg.append('text')
 	.attr('class', 'axis-label')
-	.attr('transform', 'rotate(270,'+y_ax_x_pos+','+y_ax_y_pos+') translate(0,-'+y_ax_x_pos/2+')');
-	.attr('x', y_axis_x_position)
-	.attr('y', y_axis_y_position)
+	.attr('transform', 'rotate(270,'+y_ax_x_pos+','+y_ax_y_pos+') translate(0,-'+y_ax_x_pos/2+')')
+	.attr('x', y_ax_x_pos)
+	.attr('y', y_ax_y_pos)
 	.text('Revenue');
 
 }
