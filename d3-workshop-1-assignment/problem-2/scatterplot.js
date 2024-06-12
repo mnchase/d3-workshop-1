@@ -1,25 +1,32 @@
-const container_id = ''; // TODO: Set container_id to the id you gave to the div in problem-2/index.html 
+const container_id = 'NaturalHistoryMuseums';
 const width = 600, height = 400;
 const margin = {
     top: 50,
     bottom: 50,
-    left: 50,
+    left: 60,
     right: 50
 }
 
 const title_x_position = margin.left + (width-(margin.left+margin.right))/2;
 const title_y_position = margin.top;
 
-const x_axis_x_position = margin.left + (width-(margin.left+margin.right))/2;
-const x_axis_y_position = height - margin.bottom/2;
+const x_ax_x_pos = margin.left + (width-(margin.left+margin.right))/2;
+const x_ax_y_pos = height - margin.bottom/2;
 
-const y_axis_x_position = margin.left/2;
-const y_axis_y_position = margin.top + (height-(margin.top+margin.bottom))/2;
+const y_ax_x_pos = margin.left/2;
+const y_ax_y_pos = margin.top + (height-(margin.top+margin.bottom))/2;
 
+const graph_width = width - (margin.left + margin.right)
+const graph_height = height - (margin.top + margin.bottom)
 
-const xScale = d3.scaleLinear().domain([-1e8, 1.8e9]).range([0, width - (margin.left + margin.right)]);
+x_min = -1e8
+x_max = 1.8e9
+y_min = -1e8
+y_max = 1.2e9
 
-const yScale = d3.scaleLinear().domain([-1e8, 1.2e9]).range([height - (margin.top + margin.bottom), 0]);
+const xScale = d3.scaleLinear().domain([x_min, x_max]).range([0, graph_width]);
+
+const yScale = d3.scaleLinear().domain([y_min, y_max]).range([graph_height, 0]);
 
 const abbreviateNumber = function(num) {
     if (num / 1e9 >= 1) 
@@ -28,6 +35,14 @@ const abbreviateNumber = function(num) {
         return '$' + (num/1e6) + 'M';
     else 
         return '$' + num;
+}
+
+const x_ax_trans = function(num) {
+    return (num-x_min)/(x_max-x_min)*graph_width
+}
+
+const y_ax_trans = function(num) {
+    return (1-(num-y_min)/(y_max-y_min))*graph_height
 }
 
 function drawXAxis(svg) {
@@ -44,46 +59,57 @@ function drawYAxis(svg) {
         .call(d3.axisLeft(yScale).tickFormat(abbreviateNumber));
 }
 
-function drawDots(data) {
-    /* TODO:
-        1. Append a group to the svg
-        2. Translate this group margin.left pixels in the x direction and margin.top in the y direction
-        3. Within this group, create a selection of all elements with class "dot"
-        3. Bind the data array to the selection
-        4. Use enter() and append() to create a dot for each of the elements in the data array
-        5. Set the necessary attributes for the dots
-            Hint: The scatter plot's x axis represents the museum's Income property 
-            Hint: The scatter plot's y axis represents the museum's Revenue property
-            Hint: The dots should all be the same size
-        6. Set the dot class to "dot"                                                           */
+function drawDots(svg, museums) {
+    let group = svg.append('g')
+		    .attr('transform', 'translate('+margin.left+','+margin.top+')');
+    group.selectAll('dot')
+	  .data(museums)
+	  .enter()
+	  .append('circle')
+	  .attr('cx', function(d,i){return x_ax_trans(d.Income)})
+	  .attr('cy', function(d,i){return y_ax_trans(d.Revenue)})
+	  .attr('r', 5)
+	  .attr('class', 'dot');
 }
 
-function filterMuseums(d){
-    /* TODO: Filter the data to only include natural history museums 
-                Hint: the data has a "Museum Type" property                                     */
+function filterMuseums(museums){
+    return museums.filter(function(museum) {
+			    return museum["Museum Type"] == "NATURAL HISTORY MUSEUM"})
 }
 
 function drawScatterPlot(data) {
     let svg = d3.select('#' + container_id)
                 .append('svg')
-                    /* TODO: Set the width and height of the svg                                */
-                    ;
+		.attr('width', width)
+		.attr('height', height);
 
-    /* TODO: 
-        1. Call the drawDots, drawXAxis, and drawYAxis function with the appropriate parameters
-        2. Add a title to the visualization
-            a. The title should have the class "title"
-        3. Add x and y axis labels to the visualization
-            a. The axis labels should have the class "axis-label"
-            b. The y axis should be rotated counter-clockwise 90 degrees                        */
+    drawDots(svg, data)
+
+    drawXAxis(svg)
+    drawYAxis(svg)
+    svg.append('text')
+	.attr('class', 'title')
+	.attr('x', title_x_position)
+	.attr('y', title_y_position)
+	.text('Natural History Museums: Revenue vs Income');
+    svg.append('text')
+	.attr('class', 'axis-label');
+	.attr('x', x_axis_x_position)
+	.attr('y', (height+x_axis_y_position)/2)
+	.text('Income');
+    svg.append('text')
+	.attr('class', 'axis-label')
+	.attr('transform', 'rotate(270,'+y_ax_x_pos+','+y_ax_y_pos+') translate(0,-'+y_ax_x_pos/2+')');
+	.attr('x', y_axis_x_position)
+	.attr('y', y_axis_y_position)
+	.text('Revenue');
 
 }
 
 function main(){
-    /* TODO: 
-        1. Load the museums_edited.csv file from the data/ directory
-        2. Filter the data 
-        2. then call drawScatterPlot with the resulting data */
+    d3.csv('data/museums_edited.csv')
+	.then(filterMuseums)
+	.then(drawScatterPlot);
 }
 
 main();

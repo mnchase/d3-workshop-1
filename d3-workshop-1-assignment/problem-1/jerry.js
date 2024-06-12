@@ -24,17 +24,6 @@ function makeJerry(jerry){
 		.attr('y', function(elem,j){return i*square_height})
 		.style('fill', function(elem,j){return elem})
     })
-		// Select all <rect> elements in the DOM. Note: This is valid even if there are no <rect> elements yet.
-            /* TODO: 
-                1. Bind the row array to this selection.
-                2. Use enter() and append() to create a square for each of the 17 pixels in the row array
-                3. Set the necessary attributes for the squares
-                    Hint: These attributes should use square_width and/or square_height
-                    Hint: The x and y coordinates should depend on the corresponding Jerry pixel's i and j values respectively.
-                4. Style the squares
-                    Hint: row is an array of rgb strings, which are valid values for the fill property in css.
-                    */
-    
 }
 
 d3.json('data/jerry_codes.json').then(makeJerry)
