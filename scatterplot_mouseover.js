@@ -67,20 +67,38 @@ function drawYLabel(svg,ax_label) {
 	.text(ax_label);
 }
 
+function drawName(group) {
+    group.append('text')
+    .data(this)
+    .enter()
+    .attr('x', this.cx)
+    .attr('y', this.cy)
+    .text('Hello!')
+
+}
+
 function drawDots(svg,objects,labels,domains) {
     const x_min = domains['x_domain']['x_min'];
     const x_max = domains['x_domain']['x_max'];
     const y_min = domains['y_domain']['y_min'];
     const y_max = domains['y_domain']['y_max'];
+
     const x_ax_trans = function(num) {
     	return (num-x_min)/(x_max-x_min)*graph_width
-    }
-
+    };
     const y_ax_trans = function(num) {
     	return (1-(num-y_min)/(y_max-y_min))*graph_height
-    }
+    };
+
     let group = svg.append('g')
-		    .attr('transform', 'translate('+margin.left+','+margin.top+')');
+		    .attr('transform', 'translate('+margin.left+', '+margin.top+')');
+    let info = group.append('g')
+		    .attr('transform', 'translate('+margin.left+', '+margin.top+')')
+		    .attr('class', 'info')
+		    .append('text')
+		    .style('opacity', 0)
+		
+
     group.selectAll('dot')
 	  .data(objects)
 	  .enter()
@@ -88,7 +106,36 @@ function drawDots(svg,objects,labels,domains) {
 	  .attr('cx', function(d,i){return x_ax_trans(d[labels['x']])})
 	  .attr('cy', function(d,i){return y_ax_trans(d[labels['y']])})
 	  .attr('r', 5)
-	  .attr('class', 'dot');
+	  .attr('class', 'dot')
+	  .on('mouseover',function(d, i) {
+		d3.select(this)
+			.transition()
+			.duration('50')
+			.attr('fill-opacity', 1)
+
+		info.transition()
+			.duration(50)
+			.style('opacity', 1)
+
+		info.attr('x', d.cx)
+			.attr('y', d.cy)
+
+		info.append('tspan')
+			.text(labels['x']+': '+d[labels['x']]);
+    		info.append('tspan')
+			.attr('dy', '1.2em')
+			.text(labels['y']+': '+d[labels['y']]);
+	  })
+      	  .on('mouseout',function (d, i) {
+        	d3.select(this)
+          		.transition()
+          		.duration(50)
+			.style('fill-opacity', 0.25)
+
+		info.transition()
+			.duration(50)
+			.style('opacity', 0)
+      	  })
 }
 
 function filterObjects(objects,sieve){
